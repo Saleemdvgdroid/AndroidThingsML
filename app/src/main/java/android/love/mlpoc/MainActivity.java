@@ -29,6 +29,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.google.android.things.pio.Gpio;
+import com.google.android.things.pio.GpioCallback;
 import com.google.android.things.pio.PeripheralManager;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -52,6 +53,7 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.PriorityQueue;
 
 public class MainActivity extends Activity {
@@ -98,6 +100,21 @@ public class MainActivity extends Activity {
                 onPictureTaken(imageBytes);
             };
 
+    private GpioCallback gpioCallback = new GpioCallback() {
+        @Override
+        public boolean onGpioEdge(Gpio gpio) {
+            try {
+                if (gpio.getValue()) {
+                    takePic();
+                }
+            } catch (IOException e) {
+                Log.d(TAG, "onGpioEdge: "+e.getMessage());
+            }
+
+            return true;
+        }
+    };
+
     private String TAG = MainActivity.class.getSimpleName();
     //motor one
     private String MOTOR_IN1 = "GPIO6_IO14";
@@ -106,7 +123,7 @@ public class MainActivity extends Activity {
     private String MOTOR_IN3 = "GPIO2_IO00";
     private String MOTOR_IN4 = "GPIO2_IO05";
 
-    private String IR_RECEIVER = "GPIO2_IO05";
+    private String IR_RECEIVER = "GPIO2_IO07";
 
     private Gpio mMotorOnePin1 = null;
     private Gpio mMotorOnePin2 = null;
@@ -145,6 +162,7 @@ public class MainActivity extends Activity {
     private Bitmap bitmap;
     private Bitmap rotatedBitmap;
     private DBHelper database;
+    private Gpio mIRPin;
 
 
     @Override
@@ -165,6 +183,11 @@ public class MainActivity extends Activity {
             mMotorTwoPin1.setDirection(Gpio.DIRECTION_OUT_INITIALLY_LOW);
             mMotorTwoPin2 = peripheralManager.openGpio(MOTOR_IN4);
             mMotorTwoPin2.setDirection(Gpio.DIRECTION_OUT_INITIALLY_LOW);
+
+            mIRPin = peripheralManager.openGpio(IR_RECEIVER);
+            mIRPin.setDirection(Gpio.DIRECTION_IN);
+            mIRPin.setEdgeTriggerType(Gpio.EDGE_RISING);
+            mIRPin.registerGpioCallback(gpioCallback);
             registerMyReceiver();
             setUpWifi();
 
@@ -189,9 +212,7 @@ public class MainActivity extends Activity {
         mCamera = DemoCamera.getInstance(this);
         mCamera.initializeCamera(this, mCameraHandler, mOnImageAvailableListener);
         findViewById(R.id.button).setOnClickListener(v -> {
-            layout.setVisibility(View.GONE);
-            image_view.setVisibility(View.VISIBLE);
-            mCamera.takePicture();
+            takePic();
         });
 
         radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
@@ -213,6 +234,12 @@ public class MainActivity extends Activity {
         );
 
         initializeML();
+    }
+
+    private void takePic() {
+        layout.setVisibility(View.GONE);
+        image_view.setVisibility(View.VISIBLE);
+        mCamera.takePicture();
     }
 
     /**
@@ -429,7 +456,7 @@ public class MainActivity extends Activity {
             mInterpreter.run(inputs, mDataOptions)
                     .addOnFailureListener(Throwable::printStackTrace).continueWith(
                     task -> {
-                        byte[][] labelProbArray = task.getResult()
+                        byte[][] labelProbArray = Objects.requireNonNull(task.getResult())
                                 .getOutput(0);
                         List<String> topLabels = getTopLabels(labelProbArray);
                         ArrayList<String> spinnerArray = new ArrayList<String>();
