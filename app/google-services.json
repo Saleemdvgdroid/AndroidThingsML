@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "26452187388",
+    "firebase_url": "https://mlpoc-c8920.firebaseio.com",
+    "project_id": "mlpoc-c8920",
+    "storage_bucket": "mlpoc-c8920.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:26452187388:android:1f148d9ceb0e2055",
+        "android_client_info": {
+          "package_name": "android.love.mlpoc"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "26452187388-lk0r2quv4e0kdr0mgn99ie09kknnroe0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "android.love.mlpoc",
+            "certificate_hash": "d36dcc916e875a7cfa1281239a18dcb247b15fdc"
+          }
+        },
+        {
+          "client_id": "26452187388-jc205dpo4dfapegn4b0n028ikb4nqeog.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgtLnAx8eOe-xMyFBPlwE9sSU76i8FODU"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "26452187388-jc205dpo4dfapegn4b0n028ikb4nqeog.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
